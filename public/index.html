@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Socket.IO Interface</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const socket = io();
+
+            socket.emit('register', 'interface');
+
+            const form = document.getElementById('form');
+            const targetIdInput = document.getElementById('targetId');
+            const typeInput = document.getElementById('type');
+            const valueInput = document.getElementById('value');
+            const messages = document.getElementById('messages');
+            const clientListButton = document.getElementById('clientListButton');
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const command = {
+                    targetId: targetIdInput.value,
+                    type: typeInput.value,
+                    value: parseInt(valueInput.value, 10)
+                };
+                socket.emit('command', command);
+                const item = document.createElement('li');
+                item.textContent = `Command sent: ${JSON.stringify(command)}`;
+                messages.appendChild(item);
+                window.scrollTo(0, document.body.scrollHeight);
+            });
+
+            clientListButton.addEventListener('click', () => {
+                socket.emit('getClientList');
+            });
+
+            socket.on('clientList', (clientList) => {
+                const item = document.createElement('li');
+                item.textContent = `Client List: ${JSON.stringify(clientList)}`;
+                messages.appendChild(item);
+                window.scrollTo(0, document.body.scrollHeight);
+            });
+        });
+    </script>
+</head>
+<body>
+    <ul id="messages"></ul>
+    <form id="form" action="">
+        <input id="targetId" placeholder="Target Client ID" autocomplete="off" required />
+        <input id="type" placeholder="Command Type" autocomplete="off" required />
+        <input id="value" type="number" placeholder="Value" autocomplete="off" required />
+        <button>Send Command</button>
+    </form>
+    <button id="clientListButton">Get Client List</button>
+</body>
+</html>
