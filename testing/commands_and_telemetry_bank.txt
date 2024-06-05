@@ -1,0 +1,30 @@
+-----COMMANDS-----
+MOVE 0,1,2,3,4 (fwd, stop, left, right, cruise)
+LED 0,1 (on,off)
+Pitch 90+-90
+Yaw 90+-90
+Speed 0-255
+
+set countdown?
+launch
+hold
+abort
+
+
+
+-----TELEMETRY-----
+current speed
+current led state
+current movement state
+current pitch angle
+current yaw angle
+
+pad temp
+wind speed
+
+Forward looking sonar dist
+forward looking ir distance
+
+countdown duration
+current pad state(counting down, preflight, holding)
+countdown status

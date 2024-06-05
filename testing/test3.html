@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dropdown Form</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      label, input, select, button {
+        display: inline-block;
+        margin: 10px 0;
+      }
+      .createClient, .editClient {
+        border: 1px solid black;
+        padding: 5px;
+        width: 50%;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Client Debug Window Testing</h1>
+
+    <div class="createClient">
+      <h3>Create a new client</h3>
+      <form id="createClientForm">
+        <label for="newMac"><strong>MAC:</strong></label>
+        <input type="text" id="newMac" required />
+
+        <label for="newType"><strong>Type:</strong></label>
+        <input type="text" id="newType" required />
+        <button type="submit">submit</button>
+      </form>
+    </div>
+    <br /><br />
+
+    <div class="editClient">
+      <h3>Edit Existing Client</h3>
+
+      <label for="dropdownMenu"><strong>Select from dropdown:</strong></label>
+      <select id="dropdownMenu">
+        <option value="">-- Select an option --</option>
+      </select>
+
+      <p><strong>Selected Client:</strong> <span id="selectedClient">None</span></p>
+
+      <form>
+        <label for="setType"><strong>set Type:</strong></label>
+        <input type="text" id="setType" required />
+        <button type="submit">submit</button>
+      </form>
+
+      <form>
+        <label for="setMAC"><strong>set MAC:</strong></label>
+        <input type="text" id="setMAC" required />
+        <button type="submit">submit</button>
+      </form>
+
+      <form>
+        <label for="setName"><strong>set Name:</strong></label>
+        <input type="text" id="setName" required />
+        <button type="submit">submit</button>
+      </form>
+
+      <form>
+        <label for="setID"><strong>set ID:</strong></label>
+        <input type="text" id="setID" required />
+        <button type="submit">submit</button>
+      </form>
+
+      <form>
+        <label for="setIPADDR"><strong>set IPADDR:</strong></label>
+        <input type="text" id="setIPADDR" required />
+        <button type="submit">submit</button>
+      </form>
+    </div>
+
+    <div class="clientInfo">
+      <h3>Selected Client Information</h3>
+    </div>
+
+    <script src="test3.js"></script>
+  </body>
+</html>

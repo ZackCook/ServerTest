@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Socket.IO Interface</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const socket = io();
+
+            socket.emit('register', 'interface');
+
+            const form = document.getElementById('form');
+            const targetIdInput = document.getElementById('targetId');
+            const typeInput = document.getElementById('type');
+            const valueInput = document.getElementById('value');
+            const messages = document.getElementById('messages');
+            const clientListButton = document.getElementById('clientListButton');
+            const robotDropdown = document.getElementById('robotDropdown');
+            const cameraDropdown = document.getElementById('cameraDropdown');
+            let activeRobot = null;
+            let activeCamera = null;
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const command = {
+                    targetId: targetIdInput.value,
+                    type: typeInput.value,
+                    value: parseInt(valueInput.value, 10)
+                };
+                if (activeRobot || activeCamera) {
+                    const activeClientId = activeRobot ? activeRobot : activeCamera;
+                    command.targetId = activeClientId;
+                    socket.emit('command', command);
+                    const item = document.createElement('li');
+                    item.textContent = `Command sent to ${activeClientId}: ${JSON.stringify(command)}`;
+                    messages.appendChild(item);
+                    window.scrollTo(0, document.body.scrollHeight);
+                } else {
+                    alert('Please select a client first');
+                }
+            });
+
+            clientListButton.addEventListener('click', () => {
+                socket.emit('getClientList');
+            });
+
+            socket.on('clientList', (clientList) => {
+                updateDropdowns(clientList);
+            });
+
+            const updateDropdowns = (clientList) => {
+                robotDropdown.innerHTML = '<option value="" disabled selected>Select a robot</option>';
+                cameraDropdown.innerHTML = '<option value="" disabled selected>Select a camera</option>';
+                clientList.forEach(client => {
+                    const option = document.createElement('option');
+                    option.value = client.id;
+                    option.textContent = client.id;
+                    if (client.type === 'robot') {
+                        robotDropdown.appendChild(option);
+                    } else if (client.type === 'camera') {
+                        cameraDropdown.appendChild(option);
+                    }
+                });
+            };
+
+            robotDropdown.addEventListener('change', (e) => {
+                activeRobot = e.target.value;
+                activeCamera = null;
+                document.getElementById('activeClient').textContent = `Active Robot: ${activeRobot}`;
+            });
+
+            cameraDropdown.addEventListener('change', (e) => {
+                activeCamera = e.target.value;
+                activeRobot = null;
+                document.getElementById('activeClient').textContent = `Active Camera: ${activeCamera}`;
+            });
+
+            // Handle dummy client creation
+            const dummyForm = document.getElementById('dummyForm');
+            dummyForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const dummyType = document.getElementById('dummyType').value;
+                const dummyId = document.getElementById('dummyId').value;
+                if (dummyType && dummyId) {
+                    socket.emit('register', dummyType, dummyId);
+                    socket.emit('getClientList');
+                } else {
+                    alert('Please fill in both fields');
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <ul id="messages"></ul>
+    <form id="form" action="">
+        <input id="targetId" placeholder="Target Client ID" autocomplete="off" required />
+        <input id="type" placeholder="Command Type" autocomplete="off" required />
+        <input id="value" type="number" placeholder="Value" autocomplete="off" required />
+        <button>Send Command</button>
+    </form>
+    <button id="clientListButton">Get Client List</button>
+    <br>
+    <label for="robotDropdown">Select a Robot:</label>
+    <select id="robotDropdown">
+        <option value="" disabled selected>Select a robot</option>
+    </select>
+    <br>
+    <label for="cameraDropdown">Select a Camera:</label>
+    <select id="cameraDropdown">
+        <option value="" disabled selected>Select a camera</option>
+    </select>
+    <p id="activeClient">Active Client: None</p>
+    <hr>
+    <h3>Create Dummy Client</h3>
+    <form id="dummyForm" action="">
+        <label for="dummyType">Client Type:</label>
+        <input id="dummyType" placeholder="e.g., robot, camera" required />
+        <br>
+        <label for="dummyId">Client ID:</label>
+        <input id="dummyId" placeholder="Unique Client ID" required />
+        <br>
+        <button>Create Dummy Client</button>
+    </form>
+</body>
+</html>

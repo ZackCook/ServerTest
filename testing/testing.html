@@ -13,17 +13,9 @@
         box-sizing: border-box;
       }
       input {
-        width: 50px;
+        width: 100px;
         align-items: center;
       }
-
-      #commandColumn {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        height: 100vh;
-      }
-
       .moveButton {
         align-content: center;
         align-items: center;
@@ -44,14 +36,6 @@
         color: #ffffff;
       }
 
-      .pingButton {
-        height: 40px;
-        width: 125px;
-        background-color: #2c7f9b;
-        font-weight: bold;
-        color: #ffffff;
-      }
-
       .padButton {
         align-content: center;
         align-items: center;
@@ -62,7 +46,6 @@
         color: #ffffff;
         white-space: normal;
       }
-
       .container {
         display: grid;
         grid-template-rows: auto 1fr; /* Header auto height, columns take remaining space */
@@ -92,7 +75,6 @@
 
       #speedSlider {
         accent-color: #2c7f9b;
-        width: 100px;
       }
 
       @media screen and (max-width: 768px) {
@@ -108,24 +90,18 @@
       }
     </style>
     
-    <script src="/socket.io/socket.io.js"></script>
+    
   </head>
   <body>
     <div class="container">
       <div class="header">
         <h1>Interface Design V0.1 testing</h1>
       </div>
-
-
       <div class="columns">
-        <div class="column" id="commandColumn">
+        <div class="column">
           <h1 align="center"><u>Command Panel</u></h1>
           <h3 align="center">ROVER CONTROLS</h3>
-          <select name="Select Active Client" id="activeClientDropdown">
-            
-          </select>
-          <input type="button" value="PING active client" class="pingButton" align="center" />
-          <table width="220" height="220" border="1px" cellpadding="5px" align="center" id="roverCommandTable">
+          <table width="220" height="220" border="1px" cellpadding="5px" align="center" id="commandTable">
             <tbody>
               <tr>
                 <td>
@@ -151,7 +127,7 @@
                 </td>
               </tr>
               <tr>
-                <td><input type="button" value="Party Mode" class="moveButton" id="partyButton"></td>
+                <td>&nbsp;</td>
                 <td>
                   <input type="button" value="Reverse" class="moveButton" id="reverseButton" />
                 </td>
@@ -160,7 +136,7 @@
             </tbody>
           </table>
 
-          <table align="center" border="1px" id="roverAuxilliaryTable">
+          <table align="center" border="1px">
             <tbody>
               <tr>
                 <td>
@@ -169,15 +145,13 @@
                 <td>
                   <input type="button" value="LED OFF" class="LEDButton" id="LEDOffButton" />
                 </td>
-                <td>
-                  
-                </td>
               </tr>
             </tbody>
           </table>
-
+          &nbsp;
           <h3 align="center">PAD CONTROLS</h3>
-          <table width="100" border="1" cellpadding="5" id="padControlTable" align="center">
+          <div class="padControls">
+            <table width="100" border="1" cellpadding="5" id="padControlTable" align="center">
               <tbody>
                 <tr>
                   <td>
@@ -206,13 +180,9 @@
                   <td>&nbsp;</td>
                 </tr>
               </tbody>
-          </table>
-
-          
+            </table>
+          </div>
         </div>
-
-
-
         <div class="column">
           <h2 align="center"><u>Telemetry Panel</u></h2>
           <h4><u>Rover telemetry</u></h4>
@@ -244,6 +214,6 @@
     </div>
 
 
-    <script src="index.js"></script>
+    <script src="testing.js"></script>
   </body>
 </html>

@@ -3,32 +3,35 @@
 #include <ArduinoJson.h>
 
 // Replace these with your network credentials
-const char* ssid = "your_SSID";
-const char* password = "your_PASSWORD";
+const char* ssid = "TITS";
+const char* password = "rovwaademilftits";
 
 // Replace with the IP address and port of your server
 const char* serverAddress = "192.168.1.100";  // Example: "192.168.1.100"
 const int serverPort = 3000;
 
 SocketIoClient socket;
-const char* uniqueId = "esp32-001";  // Unique ID for this ESP32
-const char* deviceType = "robot";    // Device type (e.g., "robot", "sensor", "light")
+const char* clientId = "696969696969";  // Unique ID for this ESP32
+const char* clientType = "simple";    // Device type (e.g., "robot", "sensor", "light")
 
 void event(const char * payload, size_t length) {
     Serial.print("Received: ");
     Serial.println(payload);
 
-    // Parse the received command (JSON format expected)
-    StaticJsonDocument<200> doc;
-    DeserializationError error = deserializeJson(doc, payload);
-    if (error) {
-        Serial.print(F("deserializeJson() failed: "));
-        Serial.println(error.f_str());
-        return;
-    }
+    /*
+    /*
+    ! // Parse the received command (JSON format expected)
+    !StaticJsonDocument<200> doc;
+    !DeserializationError error = deserializeJson(doc, payload);
+    !if (error) {
+    !    Serial.print(F("deserializeJson() failed: "));
+    !    Serial.println(error.f_str());
+    !    return;
+    !}
+    
 
-    const char* type = doc["type"];
-    int value = doc["value"];
+    // ! const char* type = doc["type"];
+    // ! int value = doc["value"];
 
     // Handle the command based on its type
     if (strcmp(type, "move") == 0) {
@@ -43,8 +46,10 @@ void event(const char * payload, size_t length) {
             Serial.println("Turning lights off");
             // Implement lights off logic here
         }
-    }
-}
+    }//end else if (strcmp(type, "lights") == 0)
+
+    */
+}//end event()
 
 void setup() {
     Serial.begin(115200);
@@ -59,20 +64,20 @@ void setup() {
     Serial.print("Connected! IP address: ");
     Serial.println(WiFi.localIP());
 
-    socket.on("connect", []() {
+    socket.on("connect", [](const char* payload, size_t length){
         Serial.println("Connected to server");
-        String registerMessage = String("\"") + deviceType + "\", \"" + uniqueId + "\"";
-        socket.emit("register", registerMessage.c_str());
+        
     });
 
-    socket.on("command", event);
+    socket.on("commandExecute", event);
 
-    socket.on("disconnect", []() {
+    socket.on("disconnect", [](const char* payload, size_t length){
         Serial.println("Disconnected from server");
     });
 
-    socket.begin(serverAddress, serverPort);
-    socket.loop();
+    socket.begin(serverAddress, serverPort,"simple");
+    //socket.connect();
+    
 }
 
 void loop() {
