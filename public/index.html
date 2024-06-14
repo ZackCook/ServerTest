@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Interface Design V0.1</title>
+    <title>8====D~~~~~{()}</title>
     <style>
       body,
       html {
@@ -44,7 +44,7 @@
         color: #ffffff;
       }
 
-      .pingButton {
+      .kickButton {
         height: 40px;
         width: 125px;
         background-color: #2c7f9b;
@@ -108,23 +108,21 @@
       }
     </style>
     
-    <script src="/socket.io/socket.io.js"></script>
+    <script src="index.js"></script>
   </head>
   <body>
     <div class="container">
       <div class="header">
-        <h1>Interface Design V0.1 testing</h1>
+        <h1>Interface Design V0.1 testing 8====D~~~~~{()}</h1>
       </div>
-
 
       <div class="columns">
         <div class="column" id="commandColumn">
           <h1 align="center"><u>Command Panel</u></h1>
           <h3 align="center">ROVER CONTROLS</h3>
           <select name="Select Active Client" id="activeClientDropdown">
-            
           </select>
-          <input type="button" value="PING active client" class="pingButton" align="center" />
+          <input type="button" value="Kick active client" class="kickButton" id="kickButton" align="center" />
           <table width="220" height="220" border="1px" cellpadding="5px" align="center" id="roverCommandTable">
             <tbody>
               <tr>
@@ -170,7 +168,6 @@
                   <input type="button" value="LED OFF" class="LEDButton" id="LEDOffButton" />
                 </td>
                 <td>
-                  
                 </td>
               </tr>
             </tbody>
@@ -207,14 +204,13 @@
                 </tr>
               </tbody>
           </table>
-
-          
         </div>
-
-
 
         <div class="column">
           <h2 align="center"><u>Telemetry Panel</u></h2>
+
+          <span id="activeClientLabel">Active client will be displayed here</span>
+
           <h4><u>Rover telemetry</u></h4>
           <ul>
             <li id="speedLabel">Speed</li>
@@ -242,8 +238,5 @@
         </div>
       </div>
     </div>
-
-
-    <script src="index.js"></script>
   </body>
 </html>

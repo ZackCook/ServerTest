@@ -1,20 +1,14 @@
 #include <WiFi.h>
 #include <WebSocketsClient.h>
 #include <ArduinoJson.h>
-#include <Arduino.h>
 
-
-const char* ssid = "SpectrumSetup-CD";
-const char* password = "leastpoet407";
-const char* serverAddress = "192.168.1.26"; // e.g., "192.168.1.100"
+const char* ssid = "your_SSID";
+const char* password = "your_PASSWORD";
+const char* serverAddress = "your_server_IP"; // e.g., "192.168.1.100"
 const int serverPort = 3000;
 
 WebSocketsClient webSocket;//web socket instance that will connect to wqensocket server and handle RTC
-String serverSideID;// will be assigned when sent back from the server after a successful client verification (server side)
-
-// LED Pin
-const int ledPin = 2;
-bool ledState = false;
+String uniqueID;// will be assigned when sent back from the server after a successful client verification (server side)
 
 /*
 webSocket event handle, covering all different types of websocket events
@@ -36,13 +30,6 @@ WStype_TEXT event type messages are assumed to arrive in JSON format and conform
 @return void
 */
 void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
-
-    const size_t capacity = JSON_OBJECT_SIZE(3) + 128; // Adjust the capacity as needed
-        if (length > capacity) {
-            Serial.println("Payload size exceeds buffer capacity");
-            return;
-        }
-
     if (type == WStype_TEXT) {//if the websocket event type is 'text'
         StaticJsonDocument<200> jsonDoc;//create a json doc, static of size 200 should be plenty of space for now
         DeserializationError error = deserializeJson(jsonDoc, payload, length);//create an error that we will throw if deserialization of the JSON payload fails
@@ -52,26 +39,15 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
             return;
         }//end DeserializationError check
 
-        Serial.print("Message received: ");
-        Serial.println(serializeJson(jsonDoc,Serial));
-
         const char* msgType = jsonDoc["type"];// msgType is set to jsondoc 'type' field, this is used when determining what message type has been Received
         if (strcmp(msgType, "cmdExe") == 0) {//if the msgType is cmdExe
-            Serial.println("allocating json");
             const char* cmdType = jsonDoc["cmdType"];// create a cmdType variale locally and set it to the value stored in the jsondoc 'cmdType' field
             int cmdMagnitude = jsonDoc["cmdMagnitude"];// create a cmdMagnitude cariable locally and set it to the value stored in the jsondoc 'cmdMagnitude' field
             Serial.printf("Received cmdExe: type=%s, magnitude=%d\n", cmdType, cmdMagnitude);
-            if(strcmp(cmdType,"LED") == 0){
-              if(cmdMagnitude == 1){
-                digitalWrite(ledPin, HIGH);
-              }else{
-                digitalWrite(ledPin,LOW);
-              }//end magnitude check
-            }//end cmdExe switch logic
-
+            // Handle command execution
         } else if (strcmp(msgType, "assignedID") == 0) {// if the incoming message type is assignedID, an assigned uniqueID is being sent from the server
-            serverSideID = jsonDoc["id"].as<String>();//stores the uniqueID as a string, locally
-            Serial.printf("Received assignedID: id=%s\n", serverSideID.c_str());
+            uniqueID = jsonDoc["id"].as<String>();//stores the uniqueID as a string, locally
+            Serial.printf("Received assignedID: id=%s\n", uniqueID.c_str());
         }
     } else if (type == WStype_DISCONNECTED) {
         Serial.println("WebSocket Disconnected");
@@ -80,7 +56,7 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
         Serial.println("WebSocket Connected");
         sendVerification();//send verification data to the server upon connection event
     }
-}//end webSocketEvent()
+}
 
 /*
 	Handler for sending verification data when client initially connects to server
@@ -88,39 +64,37 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
 void sendVerification() {
     StaticJsonDocument<200> jsonDoc;
     jsonDoc["type"] = "verification";
-    jsonDoc["clientType"] = "simple";//hardcoded client type, prevents inadvertent reassignment
+    jsonDoc["clientType"] = "dummy";//hardcoded client type, prevents inadvertent reassignment
     String jsonData;//temp variable to store json data in a string before being serialized.
     serializeJson(jsonDoc, jsonData);//serialize temp string into json
     webSocket.sendTXT(jsonData);//send serialized json to the server for verification.
-}//end sendVerification()
+}end sendVerification()
 
 /*
 	handler for sending local sensor data (telemetry) to the server 
 */
 void sendTelemetry() {
-    StaticJsonDocument<512> jsonDoc;// static jsondoc of sixe 200 should be plenty to encapsulate any size telemetry message
+    StaticJsonDocument<200> jsonDoc;// static jsondoc of sixe 200 should be plenty to encapsulate any size telemetry message
     jsonDoc["type"] = "telemetry";
-    jsonDoc["id"] = serverSideID;//id corresponding with the telemetry being sent
+    jsonDoc["id"] = uniqueID;//id corresponding with the telemetry being sent
     // Add telemetry data here
     jsonDoc["sensorData"] = 123;  // Example data used for demonstration purposes
     String jsonData;//temp json String
     serializeJson(jsonDoc, jsonData);// serialize temp string into jsondoc
-    //webSocket.sendTXT(jsonData);//send telemetry to server
-}//end sendTelemetry()
+    webSocket.sendTXT(jsonData);//send telemetry to server
+}//edn sendTelemetry()
 
 void setup() {
-    Serial.begin(115200);//init serial !!!!REMOVE UPON DEPLOYMENT!!!!
-    WiFi.begin(ssid, password);//assign wifi credentials
+    Serial.begin(115200);
+    WiFi.begin(ssid, password);
 
     while (WiFi.status() != WL_CONNECTED) {
         delay(1000);
         Serial.println("Connecting to WiFi...");
-    }//wait for wifi to connect before proceeding
+    }
 
     Serial.println("Connected to WiFi. IP address: ");
     Serial.println(WiFi.localIP());
-
-    pinMode(ledPin, OUTPUT);
     
     webSocket.begin(serverAddress, serverPort, "/");//set routing for webSocket server
     webSocket.onEvent(webSocketEvent);//set event listener for webSocket events
@@ -128,4 +102,14 @@ void setup() {
 
 void loop() {
     webSocket.loop();
+	
+	/*
+    // Example of sending telemetry data
+    if (Serial.available() > 0) {
+        char cmd = Serial.read();
+        if (cmd == 't') {
+            sendTelemetry();
+        }
+    }
+	*/
 }//end loop()
